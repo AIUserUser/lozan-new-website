@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkout
+Disallow: /en/cart
+Disallow: /en/checkout
+Disallow: /order-confirmation
+Disallow: /en/order-confirmation
+Sitemap: https://lozan-kw.com/sitemap.xml

@@ -2,34 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\TelegramSubscriber;
+use App\Services\SitemapService;
 use App\Services\TelegramNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class UtilityController extends Controller
 {
-    public function sitemap(): Response
+    public function sitemap(SitemapService $sitemap): Response
     {
-        $products = Product::query()->published()->get();
-        $urls = [];
-        foreach (['ar' => '', 'en' => 'en'] as $locale => $prefix) {
-            $base = $prefix === '' ? url('/') : url('/en');
-            $urls[] = ['loc' => $base, 'changefreq' => 'daily', 'priority' => '1.0'];
-            $urls[] = ['loc' => locale_url('shop', $locale), 'changefreq' => 'daily', 'priority' => '0.9'];
-            foreach ($products as $p) {
-                $urls[] = [
-                    'loc' => product_url($p, $locale),
-                    'changefreq' => 'weekly',
-                    'priority' => '0.8',
-                    'lastmod' => optional($p->updated_at)->toAtomString(),
-                ];
-            }
-        }
-        $xml = view('store.sitemap', ['urls' => $urls])->render();
-
-        return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
+        return response($sitemap->render(), 200)->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 
     public function robots(): Response

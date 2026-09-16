@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UtilityController;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\TrackStorefront;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/sitemap.xml', [UtilityController::class, 'sitemap']);
@@ -24,6 +26,7 @@ Route::post('/admin/logout', [LoginController::class, 'destroy'])->name('admin.l
 
 Route::middleware(EnsureAdmin::class)->prefix('admin')->group(function () {
     Route::get('/', fn () => redirect()->route('admin.orders'));
+    Route::get('/analytics', AnalyticsController::class)->name('admin.analytics');
     Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders');
     Route::patch('/orders/{order}', [OrderController::class, 'update'])->name('admin.orders.update');
     Route::get('/products', [AdminProductController::class, 'index'])->name('admin.products');
@@ -47,5 +50,5 @@ $storeRoutes = function () {
     Route::match(['get', 'post'], '/order-confirmation', OrderConfirmationController::class);
 };
 
-Route::middleware([SetLocale::class.':ar'])->group($storeRoutes);
-Route::prefix('en')->middleware([SetLocale::class.':en'])->group($storeRoutes);
+Route::middleware([SetLocale::class.':ar', TrackStorefront::class])->group($storeRoutes);
+Route::prefix('en')->middleware([SetLocale::class.':en', TrackStorefront::class])->group($storeRoutes);

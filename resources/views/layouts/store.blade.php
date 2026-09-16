@@ -2,6 +2,16 @@
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
+    @if(app()->environment('production') && config('lozan.google_analytics_id'))
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('lozan.google_analytics_id') }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', @json(config('lozan.google_analytics_id')));
+        </script>
+    @endif
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $seo['title'] ?? lozan_t('meta.defaultFullTitle') }}</title>
     <meta name="description" content="{{ $seo['description'] ?? lozan_t('meta.defaultDescription') }}">

@@ -7,6 +7,7 @@
     <title>{{ lozan_t('admin.title') }} | Lozan</title>
     <link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="/css/app.css">
+    @stack('head')
 </head>
 <body>
 <div class="admin">
@@ -17,6 +18,7 @@
         </a>
         <p class="side__sub">{{ lozan_t('admin.title') }}</p>
         <nav class="side__nav">
+            <a href="{{ route('admin.analytics') }}" class="side__link {{ request()->routeIs('admin.analytics') ? 'side__link--on' : '' }}">{{ lozan_t('admin.nav.analytics') }}</a>
             <a href="{{ route('admin.orders') }}" class="side__link {{ request()->routeIs('admin.orders') ? 'side__link--on' : '' }}">{{ lozan_t('admin.nav.orders') }}</a>
             <a href="{{ route('admin.products') }}" class="side__link {{ request()->routeIs('admin.products*') ? 'side__link--on' : '' }}">{{ lozan_t('admin.nav.products') }}</a>
         </nav>
@@ -25,9 +27,10 @@
             <button type="submit" class="side__out">{{ lozan_t('admin.signOut') }}</button>
         </form>
     </aside>
-    <div class="admin__body">
+    <div class="admin__body @hasSection('wide') admin__body--wide @endif">
         @yield('content')
     </div>
 </div>
+@stack('scripts')
 </body>
 </html>

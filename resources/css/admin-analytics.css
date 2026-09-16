@@ -1,0 +1,10 @@
+/*
+ * Tailwind build for the admin analytics page only. It loads next to
+ * public/css/app.css, so preflight is skipped and utilities are marked
+ * !important to win over app.css element styles (h1, p, a, table…).
+ * Rebuild with: npm run build:admin
+ */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) important source(none);
+
+@source "../views/admin/analytics.blade.php";

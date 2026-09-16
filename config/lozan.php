@@ -4,6 +4,7 @@ return [
     'admin_email' => env('ADMIN_EMAIL', 'admin@lozan-kw.com'),
     'admin_password' => env('ADMIN_PASSWORD'),
     'whatsapp' => env('ADMIN_WHATSAPP', ''),
+    'google_analytics_id' => env('GOOGLE_ANALYTICS_ID', 'G-DW17VFXMJ4'),
     'telegram_bot_token' => env('TELEGRAM_BOT_TOKEN'),
     'telegram_webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
     'supabase_url' => env('SUPABASE_URL'),

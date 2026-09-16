@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\Analytics\Tracker;
 use App\Services\CartService;
 use App\Services\SeoService;
 use App\Services\TelegramNotifier;
@@ -30,7 +31,7 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(Request $request, CartService $cart, TelegramNotifier $telegram)
+    public function store(Request $request, CartService $cart, TelegramNotifier $telegram, Tracker $tracker)
     {
         if ($cart->count() === 0) {
             return back()->withErrors(['cart' => lozan_t('checkout.bagEmpty')]);
@@ -105,6 +106,7 @@ class CheckoutController extends Controller
         });
 
         $cart->clear();
+        $tracker->purchase($request, $order->load('items'));
         try {
             $telegram->notifyOrder($order->fresh('items'));
         } catch (\Throwable $e) {

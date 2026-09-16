@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Services\Analytics\Tracker;
 use App\Services\CartService;
 use App\Services\SeoService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function show(string $slug, SeoService $seo)
+    public function show(Request $request, string $slug, SeoService $seo)
     {
         $product = Product::query()
             ->published()
@@ -25,6 +26,7 @@ class ProductController extends Controller
             abort(404);
         }
 
+        $request->attributes->set('analytics_product_id', $product->id);
         $seoData = $seo->product($product);
 
         return view('store.product', [
@@ -34,7 +36,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function addToCart(Request $request, string $slug, CartService $cart)
+    public function addToCart(Request $request, string $slug, CartService $cart, Tracker $tracker)
     {
         $product = Product::query()->published()->where('slug', $slug)->with(['colors', 'sizes', 'images'])->firstOrFail();
         $qty = (int) $request->input('qty', 1);
@@ -68,6 +70,7 @@ class ProductController extends Controller
         }
 
         $cart->add($product, $qty, $color, $size, $backorder);
+        $tracker->addToCart($request, $product, max(1, min(99, $qty)), $color, $size);
 
         return back()->with('added', $backorder ? 'backorder' : 'ok');
     }

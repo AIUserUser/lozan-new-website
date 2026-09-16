@@ -4,10 +4,13 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "build:admin": "tailwindcss -i resources/css/admin-analytics.css -o public/css/admin-analytics.css --minify && mkdir -p public/js/vendor && cp node_modules/chart.js/dist/chart.umd.min.js public/js/vendor/chart.umd.min.js"
     },
     "devDependencies": {
+        "@tailwindcss/cli": "^4.3.3",
         "@tailwindcss/vite": "^4.0.0",
+        "chart.js": "^4.5.1",
         "concurrently": "^10.0.3",
         "laravel-vite-plugin": "^3.1",
         "tailwindcss": "^4.0.0",

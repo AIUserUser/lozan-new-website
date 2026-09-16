@@ -2034,6 +2034,8 @@ html[dir="rtl"] .side__out) {
 .line__name { font-size:1.05rem; margin:0 0 .3rem; }
 .line__remove { background:none; border:none; color:var(--ink-muted); cursor:pointer; text-decoration:underline; }
 .sum { border:1px solid var(--line); padding:1.25rem; background:var(--cream); }
+.admin__body { min-width: 0; }
+.admin__body--wide { max-width: 80rem; }
 .admin-list { list-style:none; padding:0; }
 .admin-list__row { display:flex; gap:1rem; align-items:center; border-bottom:1px solid var(--line); padding:.75rem 0; }
 .order-card { border:1px solid var(--line); padding:1rem; margin:0 0 1rem; }

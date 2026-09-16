@@ -161,7 +161,6 @@
     "goShop": "Go to the shop",
     "errAddress": "Please add your address for delivery.",
     "errGeneric": "We could not save your order. Please try again later.",
-    "errStatus": "Database is not migrated. Please run the SQL files in supabase/migrations.",
     "errPhone": "Please enter a valid phone number.",
     "errSubtotal": "Cart total is too large.",
     "errItems": "Could not send the cart contents.",
@@ -202,6 +201,7 @@
   "admin": {
     "title": "Admin",
     "nav": {
+      "analytics": "Analytics",
       "orders": "Orders",
       "products": "Products"
     },
@@ -215,9 +215,7 @@
       "submit": "Sign in",
       "submitting": "Signing in…",
       "back": "← Back to store",
-      "errTimeout": "This is taking too long. Check the browser console (F12) → Network, your .env Supabase URL/key, and that the project is online.",
-      "errGeneric": "Sign-in failed. Check your email and password, or that Supabase is configured.",
-      "errNotAdmin": "This account is not in the “admins” list yet. In Supabase → Table editor → public.admins, add a row with id exactly: {id} (same as Auth → Users for this email), then try again.",
+      "errGeneric": "Sign-in failed. Check your email and password.",
       "errCouldNotConfirm": "Could not confirm admin access. Try again in a moment."
     },
     "products": {
@@ -231,7 +229,6 @@
       "confirmDelete": "Delete this product? This cannot be undone.",
       "errDeleteFailed": "Could not delete this product.",
       "errNoPermission": "You don’t have permission to edit/delete products. Make sure your account UUID is in public.admins (it must match the auth user id), then sign out and back in.",
-      "errStorageDelete": "Product was deleted but its images stayed in Storage: {msg} (run supabase/storage-policies.sql)",
       "saleTag": "On sale",
       "stockBackorderTag": "Not available (can order)",
       "stockUnavailableTag": "Not available",
@@ -318,14 +315,122 @@
       "errOfferTooHigh": "Offer price must be lower than the regular price.",
       "errImages": "Add at least one image.",
       "errMissingFile": "Missing file for a new image preview. Try re-uploading.",
-      "errNotConfigured": "Supabase is not configured.",
       "errNotFound": "Product not found.",
-      "errTimeout": "Request timed out. Check: (1) Supabase URL and API key in .env, (2) Storage bucket and policies, (3) run SQL migrations so public.products exists.",
-      "errMissingTable": "The database table is missing or not published. In Supabase → SQL, run all files in supabase/migrations in order, then try again.",
-      "errMissingColumn": "The database column “{col}” is missing. Open Supabase → SQL editor, run the latest file in supabase/migrations (e.g. 00007_offer_price.sql), then run: notify pgrst, 'reload schema'; — and try saving again. Detail: {msg}",
-      "errStorage": "{msg} Create a public bucket (e.g. product-images) and storage policies, or check VUE_APP_SUPABASE_STORAGE_BUCKET.",
-      "errNoPermission": "Save went through but no row was changed in the database. Most likely this account is not registered as an admin. Add your account UUID to public.admins, then sign out and back in.",
-      "errGeneric": "Save failed. Check Supabase, Storage policies, and try again."
+      "errNoPermission": "Save went through but no row was changed in the database. Most likely this account is not registered as an admin. Add your account UUID to public.admins, then sign out and back in."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "How shoppers find the store and which pieces they love.",
+      "range": {
+        "d7": "Last 7 days",
+        "d30": "Last 30 days",
+        "d90": "Last 90 days"
+      },
+      "rangeA11y": "Date range",
+      "noData": "No visits recorded in this period yet. Tracking starts once this version is live — order figures below still use existing orders.",
+      "privacy": "Visitors are counted with an anonymous cookie. No IP addresses are stored; bots and admin sessions are excluded.",
+      "tableView": "Show as table",
+      "day": "Day",
+      "hour": "Hour",
+      "none": "No data yet.",
+      "kpi": {
+        "visitors": "Visitors",
+        "visitorsNote": "{new} new · {returning} returning",
+        "visits": "{count} visits",
+        "pageViews": "Page views",
+        "productViews": "Product views",
+        "addToCarts": "Added to bag",
+        "orders": "Orders",
+        "revenue": "Revenue",
+        "averageOrder": "Avg. order {value}",
+        "conversion": "Conversion",
+        "conversionNote": "Visitors who ordered"
+      },
+      "trend": {
+        "title": "Daily visitors & product views",
+        "visitors": "Visitors",
+        "productViews": "Product views"
+      },
+      "funnel": {
+        "title": "Shopping funnel",
+        "note": "Unique visitors reaching each step",
+        "steps": {
+          "visited": "Visited the store",
+          "viewedProduct": "Viewed a product",
+          "addedToBag": "Added to bag",
+          "reachedCheckout": "Reached checkout",
+          "ordered": "Placed an order"
+        }
+      },
+      "top": {
+        "title": "Most viewed pieces",
+        "views": "Product views"
+      },
+      "products": {
+        "title": "Product engagement",
+        "note": "Which pieces shoppers look at, add to the bag, and order",
+        "product": "Product",
+        "views": "Views",
+        "viewers": "Unique viewers",
+        "carts": "Bag adds",
+        "cartRate": "Bag rate",
+        "units": "Units ordered",
+        "revenue": "Revenue",
+        "hidden": "Hidden",
+        "empty": "No products yet."
+      },
+      "choices": {
+        "colors": "Popular colors",
+        "sizes": "Popular sizes",
+        "carts": "Bag adds",
+        "ordered": "Ordered",
+        "empty": "No picks yet."
+      },
+      "sources": {
+        "title": "Traffic sources",
+        "note": "Where visits came from",
+        "names": {
+          "direct": "Direct / apps",
+          "google": "Google",
+          "bing": "Bing",
+          "instagram": "Instagram",
+          "facebook": "Facebook",
+          "tiktok": "TikTok",
+          "snapchat": "Snapchat",
+          "whatsapp": "WhatsApp",
+          "x": "X (Twitter)",
+          "other": "Other sites"
+        }
+      },
+      "devices": {
+        "title": "Devices",
+        "names": {
+          "mobile": "Mobile",
+          "tablet": "Tablet",
+          "desktop": "Desktop"
+        }
+      },
+      "locales": {
+        "title": "Store language",
+        "names": {
+          "ar": "Arabic",
+          "en": "English"
+        }
+      },
+      "hours": {
+        "title": "Busiest hours (Kuwait time)",
+        "views": "Page views"
+      },
+      "customers": {
+        "title": "Top customers",
+        "note": "Orders grouped by phone number",
+        "name": "Name",
+        "phone": "Phone",
+        "orders": "Orders",
+        "total": "Total",
+        "lastOrder": "Last order",
+        "empty": "No orders in this period."
+      }
     }
   }
 }

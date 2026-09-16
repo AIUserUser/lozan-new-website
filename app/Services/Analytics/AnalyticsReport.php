@@ -57,12 +57,13 @@ class AnalyticsReport
     {
         return AnalyticsEvent::query()
             ->where('created_at', '>=', $this->start)
-            ->when($type, fn (Builder $q) => $q->where('type', $type));
+            ->when($type, fn (Builder $q) => $q->where('type', $type))
+            ->whereDoesntHave('order', fn (Builder $q) => $q->discarded());
     }
 
     private function orders(): Builder
     {
-        return Order::query()->where('created_at', '>=', $this->start);
+        return Order::query()->active()->where('created_at', '>=', $this->start);
     }
 
     private function totals(): array
@@ -178,6 +179,7 @@ class AnalyticsReport
         $sales = OrderItem::query()
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
             ->where('orders.created_at', '>=', $this->start)
+            ->whereNull('orders.discarded_at')
             ->whereNotNull('order_items.product_id')
             ->selectRaw('order_items.product_id, SUM(order_items.quantity) as units, SUM(order_items.quantity * order_items.unit_price) as revenue')
             ->groupBy('order_items.product_id')
@@ -227,6 +229,7 @@ class AnalyticsReport
         $ordered = OrderItem::query()
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
             ->where('orders.created_at', '>=', $this->start)
+            ->whereNull('orders.discarded_at')
             ->whereRaw("{$orderExpr} IS NOT NULL")
             ->selectRaw("{$orderExpr} as label, SUM(order_items.quantity) as total")
             ->groupByRaw($orderExpr)

@@ -21,6 +21,7 @@
             <a href="{{ route('admin.analytics') }}" class="side__link {{ request()->routeIs('admin.analytics') ? 'side__link--on' : '' }}">{{ lozan_t('admin.nav.analytics') }}</a>
             <a href="{{ route('admin.orders') }}" class="side__link {{ request()->routeIs('admin.orders') ? 'side__link--on' : '' }}">{{ lozan_t('admin.nav.orders') }}</a>
             <a href="{{ route('admin.products') }}" class="side__link {{ request()->routeIs('admin.products*') ? 'side__link--on' : '' }}">{{ lozan_t('admin.nav.products') }}</a>
+            <a href="{{ route('admin.telegram') }}" class="side__link {{ request()->routeIs('admin.telegram*') ? 'side__link--on' : '' }}">{{ lozan_t('admin.nav.telegram') }}</a>
         </nav>
         <form method="post" action="{{ route('admin.logout') }}">
             @csrf

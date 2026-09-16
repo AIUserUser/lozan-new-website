@@ -37,28 +37,37 @@ class UtilityController extends Controller
         if (! $chatId || $text === '') {
             return response()->json(['ok' => true]);
         }
-        $command = strtolower(explode(' ', $text)[0]);
+        // "/start@lozan_kw_bot payload" -> "/start"
+        $command = strtolower(preg_replace('/@\w+$/', '', explode(' ', $text)[0]));
+
+        $subscriber = TelegramSubscriber::query()->where('chat_id', $chatId)->first();
+        if (! $subscriber) {
+            $telegram->send($chatId, "🔒 <b>هذا البوت مخصص لفريق لوذان فقط.</b>\nThis bot is for Lozan staff only.\n\nمعرّف تيليجرام الخاص بك · Your Telegram ID:\n<code>{$chatId}</code>\n\nأرسله إلى مسؤول المتجر لإضافتك.\nSend it to the store admin to be added.");
+
+            return response()->json(['ok' => true]);
+        }
+
+        $subscriber->fill([
+            'username' => $from['username'] ?? $subscriber->username,
+            'first_name' => $from['first_name'] ?? $subscriber->first_name,
+            'last_name' => $from['last_name'] ?? $subscriber->last_name,
+        ]);
 
         if ($command === '/start') {
-            TelegramSubscriber::query()->updateOrCreate(
-                ['chat_id' => $chatId],
-                [
-                    'username' => $from['username'] ?? null,
-                    'first_name' => $from['first_name'] ?? null,
-                    'last_name' => $from['last_name'] ?? null,
-                    'active' => true,
-                ]
-            );
+            $subscriber->active = true;
+            $subscriber->save();
             $telegram->send($chatId, "✅ <b>تم الاشتراك في إشعارات الطلبات.</b>\nYou are now subscribed to order notifications.\n\nأرسل /stop للإلغاء.\nSend /stop to unsubscribe.");
         } elseif ($command === '/stop') {
-            TelegramSubscriber::query()->where('chat_id', $chatId)->update(['active' => false]);
+            $subscriber->active = false;
+            $subscriber->save();
             $telegram->send($chatId, "🛑 <b>تم إلغاء الاشتراك.</b>\nYou have unsubscribed.\n\nأرسل /start لإعادة الاشتراك.");
         } elseif ($command === '/status') {
-            $active = TelegramSubscriber::query()->where('chat_id', $chatId)->where('active', true)->exists();
-            $telegram->send($chatId, $active
+            $subscriber->save();
+            $telegram->send($chatId, $subscriber->active
                 ? "📬 أنت مشترك حاليًا.\nYou are currently subscribed."
                 : "📭 أنت غير مشترك.\nYou are not subscribed.\n\nأرسل /start للاشتراك.");
         } else {
+            $subscriber->save();
             $telegram->send($chatId, "🤖 /start /stop /status");
         }
 

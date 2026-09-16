@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\TelegramController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
@@ -29,12 +30,18 @@ Route::middleware(EnsureAdmin::class)->prefix('admin')->group(function () {
     Route::get('/analytics', AnalyticsController::class)->name('admin.analytics');
     Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders');
     Route::patch('/orders/{order}', [OrderController::class, 'update'])->name('admin.orders.update');
+    Route::patch('/orders/{order}/discard', [OrderController::class, 'discard'])->name('admin.orders.discard');
+    Route::patch('/orders/{order}/restore', [OrderController::class, 'restore'])->name('admin.orders.restore');
     Route::get('/products', [AdminProductController::class, 'index'])->name('admin.products');
     Route::get('/products/new', [AdminProductController::class, 'create'])->name('admin.products.create');
     Route::post('/products', [AdminProductController::class, 'store'])->name('admin.products.store');
     Route::get('/products/{product}', [AdminProductController::class, 'edit'])->name('admin.products.edit');
     Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('admin.products.update');
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('admin.products.destroy');
+    Route::get('/telegram', [TelegramController::class, 'index'])->name('admin.telegram');
+    Route::post('/telegram', [TelegramController::class, 'store'])->name('admin.telegram.store');
+    Route::post('/telegram/{subscriber}/test', [TelegramController::class, 'test'])->name('admin.telegram.test');
+    Route::delete('/telegram/{subscriber}', [TelegramController::class, 'destroy'])->name('admin.telegram.destroy');
 });
 
 $storeRoutes = function () {

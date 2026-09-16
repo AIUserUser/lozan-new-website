@@ -7,6 +7,7 @@ return [
     'google_analytics_id' => env('GOOGLE_ANALYTICS_ID', 'G-DW17VFXMJ4'),
     'telegram_bot_token' => env('TELEGRAM_BOT_TOKEN'),
     'telegram_webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
+    'telegram_bot_username' => env('TELEGRAM_BOT_USERNAME', 'lozan_kw_bot'),
     'supabase_url' => env('SUPABASE_URL'),
     'supabase_anon_key' => env('SUPABASE_ANON_KEY'),
     'shipping_fee' => 0,

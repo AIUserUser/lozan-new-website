@@ -11,43 +11,41 @@ class TelegramNotifier
 {
     public function notifyOrder(Order $order): void
     {
-        $token = config('lozan.telegram_bot_token');
-        if (! $token) {
+        if (! config('lozan.telegram_bot_token')) {
             return;
         }
-        $subs = TelegramSubscriber::query()->where('active', true)->pluck('chat_id');
-        if ($subs->isEmpty()) {
-            return;
-        }
-        $text = $this->buildMessage($order);
-        foreach ($subs as $chatId) {
-            $res = Http::asJson()->post("https://api.telegram.org/bot{$token}/sendMessage", [
-                'chat_id' => $chatId,
-                'text' => $text,
-                'parse_mode' => 'HTML',
-                'disable_web_page_preview' => true,
-            ]);
-            if ($res->status() === 403 || data_get($res->json(), 'error_code') === 403) {
-                TelegramSubscriber::query()->where('chat_id', $chatId)->update(['active' => false]);
-            }
-            if (! $res->successful()) {
-                Log::warning('Telegram notify failed', ['chat_id' => $chatId, 'body' => $res->body()]);
-            }
+        $message = $this->buildMessage($order);
+        foreach (TelegramSubscriber::query()->where('active', true)->pluck('chat_id') as $chatId) {
+            $this->send($chatId, $message);
         }
     }
 
-    public function send(int|string $chatId, string $text): void
+    /**
+     * Send a message; returns whether Telegram accepted it. A chat that blocked
+     * the bot or never started it is marked inactive.
+     */
+    public function send(int|string $chatId, string $text): bool
     {
         $token = config('lozan.telegram_bot_token');
         if (! $token) {
-            return;
+            return false;
         }
-        Http::asJson()->post("https://api.telegram.org/bot{$token}/sendMessage", [
+        $res = Http::asJson()->timeout(15)->post("https://api.telegram.org/bot{$token}/sendMessage", [
             'chat_id' => $chatId,
             'text' => $text,
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
         ]);
+        if ($res->successful()) {
+            return true;
+        }
+        $code = (int) data_get($res->json(), 'error_code', $res->status());
+        if ($code === 403 || ($code === 400 && str_contains((string) data_get($res->json(), 'description'), 'chat not found'))) {
+            TelegramSubscriber::query()->where('chat_id', $chatId)->update(['active' => false]);
+        }
+        Log::warning('Telegram send failed', ['chat_id' => $chatId, 'body' => $res->body()]);
+
+        return false;
     }
 
     private function buildMessage(Order $order): string

@@ -203,7 +203,8 @@
     "nav": {
       "analytics": "Analytics",
       "orders": "Orders",
-      "products": "Products"
+      "products": "Products",
+      "telegram": "Telegram"
     },
     "signOut": "Sign out",
     "langSwitcher": "Admin language",
@@ -257,7 +258,28 @@
         "confirmed": "Confirmed",
         "contacted": "Contacted",
         "done": "Done"
-      }
+      },
+      "filterA11y": "Filter orders by status",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "contacted": "Contacted",
+        "done": "Done",
+        "discarded": "Discarded"
+      },
+      "searchLabel": "Search orders",
+      "searchPlaceholder": "Name, phone, or order #",
+      "searchSubmit": "Search",
+      "searchClear": "Clear",
+      "emptyFiltered": "No orders match this filter.",
+      "discard": "Discard",
+      "restore": "Restore",
+      "confirmDiscard": "Discard this order? It will be hidden from the order list and excluded from analytics. You can restore it later.",
+      "discardedBadge": "Discarded {date}",
+      "discardedHint": "Discarded orders are excluded from analytics. Restore an order to count it again.",
+      "discardedNotice": "Order #{ref} discarded.",
+      "restoredNotice": "Order #{ref} restored."
     },
     "form": {
       "newTitle": "New product",
@@ -431,6 +453,32 @@
         "lastOrder": "Last order",
         "empty": "No orders in this period."
       }
+    },
+    "telegram": {
+      "title": "Telegram alerts",
+      "subtitle": "Only the Telegram users listed here receive new-order notifications. Anyone else who messages the bot gets nothing but their own ID.",
+      "notConfigured": "TELEGRAM_BOT_TOKEN is not set in .env — messages cannot be sent.",
+      "howTitle": "Add a staff member",
+      "how1": "They open {bot} in Telegram and send /start — the bot replies with their Telegram ID.",
+      "how2": "Enter that ID below with their name.",
+      "how3": "They receive a confirmation message and all new orders from then on.",
+      "idLabel": "Telegram user ID",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Faris",
+      "add": "Add",
+      "listTitle": "Receiving alerts ({count})",
+      "empty": "No one is added yet, so new orders are not sent to Telegram.",
+      "statusActive": "Receiving alerts",
+      "statusPending": "Needs to send /start",
+      "test": "Send test",
+      "remove": "Remove",
+      "confirmRemove": "Remove {name}? They will stop receiving order alerts.",
+      "errDuplicate": "This Telegram ID is already on the list.",
+      "addedActive": "{name} added and notified.",
+      "addedPending": "{name} added. They need to open the bot and send /start before they can receive alerts.",
+      "testSent": "Test message sent to {name}.",
+      "testFailed": "Could not reach {name}. Ask them to open the bot and send /start, then try again.",
+      "removed": "{name} removed."
     }
   }
 }

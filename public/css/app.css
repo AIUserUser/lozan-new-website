@@ -2039,6 +2039,30 @@ html[dir="rtl"] .side__out) {
 .admin-list { list-style:none; padding:0; }
 .admin-list__row { display:flex; gap:1rem; align-items:center; border-bottom:1px solid var(--line); padding:.75rem 0; }
 .order-card { border:1px solid var(--line); padding:1rem; margin:0 0 1rem; }
+.order-card--discarded { background:var(--cream); border-style:dashed; color:var(--ink-muted); }
+.order-card__head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:.5rem; }
+.order-card__badge { font-size:.75rem; padding:.2rem .55rem; border:1px solid var(--line); background:var(--paper); color:var(--ink-muted); }
+.order-card__actions { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; }
+.order-card__actions form { margin:0; }
+.order-card__actions .btn { min-height:2.6rem; padding:.55rem 1rem; }
+.order-card__discard:hover { border-color:#8a2b2b; color:#8a2b2b; background:rgba(138,43,43,.06); }
+.orders-toolbar { display:flex; flex-direction:column; gap:.75rem; margin:0 0 1.25rem; }
+.orders-toolbar__count { opacity:.65; margin-inline-start:.2rem; }
+.orders-toolbar__search { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; }
+.orders-toolbar__search .input { flex:1 1 14rem; min-width:0; }
+.orders-toolbar__search .btn { min-height:2.75rem; padding:.55rem 1rem; }
+.orders-notice { border:1px solid var(--gold); background:var(--gold-pale); padding:.6rem .85rem; margin:0 0 1rem; }
+.tg-steps { border:1px solid var(--line); background:var(--cream); padding:1rem 1.25rem; margin:1rem 0 1.5rem; }
+.tg-steps h2 { font-size:1.1rem; margin:0 0 .5rem; }
+.tg-steps ol { margin:0; padding-inline-start:1.25rem; display:flex; flex-direction:column; gap:.35rem; }
+.tg-add { display:flex; flex-wrap:wrap; align-items:flex-end; gap:.75rem 1rem; margin:0 0 2rem; }
+.tg-add .field { flex:1 1 12rem; min-width:0; }
+.tg-row { flex-wrap:wrap; }
+.tg-row__who { flex:1 1 12rem; min-width:0; }
+.tg-row__who p { margin:.15rem 0 0; }
+.tg-status { font-size:.75rem; padding:.2rem .55rem; border:1px solid var(--line); color:var(--ink-muted); white-space:nowrap; }
+.tg-status--on { border-color:#0ca30c; color:#006300; background:rgba(12,163,12,.08); }
+.tg-row form { margin:0; }
 .color-row { display:flex; gap:.5rem; margin-bottom:.5rem; flex-wrap:wrap; }
 .keep-img { display:inline-flex; flex-direction:column; gap:.25rem; margin:.4rem; }
 .check-inline { margin-inline-end:.75rem; }

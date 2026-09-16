@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductSlugRedirect;
 use App\Services\Analytics\Tracker;
 use App\Services\CartService;
 use App\Services\SeoService;
@@ -19,9 +20,10 @@ class ProductController extends Controller
             ->first();
 
         if (! $product) {
-            $legacy = Product::query()->where('legacy_id', $slug)->first();
-            if ($legacy) {
-                return redirect(product_url($legacy), 301);
+            $moved = Product::query()->where('legacy_id', $slug)->first()
+                ?? ProductSlugRedirect::query()->where('slug', $slug)->first()?->product;
+            if ($moved) {
+                return redirect(product_url($moved), 301);
             }
             abort(404);
         }

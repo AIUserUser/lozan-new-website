@@ -29,6 +29,13 @@
     <meta property="og:locale" content="{{ lozan_t('meta.ogLocale') }}">
     <meta property="og:locale:alternate" content="{{ lozan_t('meta.ogLocaleAlternate') }}">
     <meta property="og:image" content="{{ $seo['image'] ?? url('/logo.png') }}">
+    @if(!empty($seo['image_alt']))
+        <meta property="og:image:alt" content="{{ $seo['image_alt'] }}">
+    @endif
+    @if(($seo['og_type'] ?? null) === 'product')
+        <meta property="product:price:amount" content="{{ $seo['price'] }}">
+        <meta property="product:price:currency" content="{{ $seo['currency'] }}">
+    @endif
     <meta name="twitter:card" content="summary_large_image">
     <meta name="geo.region" content="KW-FA">
     <meta name="geo.placename" content="{{ lozan_t('meta.geoPlacename') }}">
@@ -38,7 +45,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/app.css">
     @isset($jsonLd)
-        <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
+        <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG) !!}</script>
     @endisset
     @yield('head')
 </head>

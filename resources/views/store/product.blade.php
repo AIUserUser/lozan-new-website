@@ -42,9 +42,10 @@
                     {{ format_kwd($product->price) }}
                 @endif
             </p>
-            @if($product->description)
+            @php $description = trim($product->localizedDescription()); @endphp
+            @if($description !== '')
                 <div class="product__desc">
-                    @foreach(preg_split("/\n+/", trim($product->description)) as $line)
+                    @foreach(preg_split("/\n+/", $description) as $line)
                         <p>{{ $line }}</p>
                     @endforeach
                 </div>

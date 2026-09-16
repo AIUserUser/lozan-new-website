@@ -8,7 +8,7 @@ class SitemapService
 {
     public function urls(): array
     {
-        $products = Product::query()->published()->get();
+        $products = Product::query()->indexable()->get();
         $latest = optional($products->max('updated_at'))->toAtomString();
         $urls = [];
         foreach (['ar', 'en'] as $locale) {

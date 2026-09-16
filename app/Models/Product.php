@@ -14,12 +14,23 @@ use Illuminate\Support\Str;
     'name',
     'name_en',
     'description',
+    'description_en',
     'price',
     'offer_price',
     'category',
     'published',
     'stock_status',
     'cover_index',
+    'seo_title_ar',
+    'seo_title_en',
+    'seo_description_ar',
+    'seo_description_en',
+    'seo_noindex',
+    'brand',
+    'sku',
+    'gtin',
+    'mpn',
+    'material',
 ])]
 class Product extends Model
 {
@@ -30,6 +41,7 @@ class Product extends Model
             'offer_price' => 'decimal:3',
             'published' => 'boolean',
             'cover_index' => 'integer',
+            'seo_noindex' => 'boolean',
         ];
     }
 
@@ -43,6 +55,11 @@ class Product extends Model
         return $this->hasMany(ProductColor::class)->orderBy('sort_order');
     }
 
+    public function slugRedirects(): HasMany
+    {
+        return $this->hasMany(ProductSlugRedirect::class);
+    }
+
     public function sizes(): HasMany
     {
         return $this->hasMany(ProductSize::class)->orderBy('sort_order');
@@ -51,6 +68,22 @@ class Product extends Model
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('published', true);
+    }
+
+    /** Published and not hidden from search engines. */
+    public function scopeIndexable(Builder $query): Builder
+    {
+        return $query->published()->where('seo_noindex', false);
+    }
+
+    public function localizedDescription(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+        if ($locale === 'en' && trim((string) $this->description_en) !== '') {
+            return (string) $this->description_en;
+        }
+
+        return (string) $this->description;
     }
 
     public function isInStock(): bool

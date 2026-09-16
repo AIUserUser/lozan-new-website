@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TelegramSubscriber;
+use App\Services\LlmsTxtService;
 use App\Services\SitemapService;
 use App\Services\TelegramNotifier;
 use Illuminate\Http\Request;
@@ -13,6 +14,24 @@ class UtilityController extends Controller
     public function sitemap(SitemapService $sitemap): Response
     {
         return response($sitemap->render(), 200)->header('Content-Type', 'application/xml; charset=UTF-8');
+    }
+
+    public function llms(LlmsTxtService $llms): Response
+    {
+        return $this->markdown($llms->index());
+    }
+
+    public function llmsFull(LlmsTxtService $llms): Response
+    {
+        return $this->markdown($llms->full());
+    }
+
+    private function markdown(string $body): Response
+    {
+        return response($body, 200)
+            ->header('Content-Type', 'text/plain; charset=UTF-8')
+            ->header('Cache-Control', 'public, max-age=3600')
+            ->header('X-Robots-Tag', 'noindex');
     }
 
     public function robots(): Response

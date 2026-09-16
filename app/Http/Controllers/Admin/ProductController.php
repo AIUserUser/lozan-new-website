@@ -71,6 +71,13 @@ class ProductController extends Controller
             'published' => 'sometimes|boolean',
             'stock_status' => 'required|in:in_stock,backorder,unavailable',
             'cover_index' => 'nullable|integer|min:0',
+            'cover' => ['nullable', 'string', 'regex:/^(existing|new):\d+$/'],
+            'keep_images' => 'array',
+            'keep_images.*' => 'integer',
+            'images' => 'array|max:20',
+            'images.*' => 'file|image|mimes:jpeg,jpg,png,webp|max:15360',
+            'sizes' => 'array',
+            'sizes.*' => 'nullable|string|max:10',
             // Advanced: SEO & rich results
             'slug' => [
                 'nullable', 'string', 'max:191',
@@ -96,6 +103,14 @@ class ProductController extends Controller
             return back()->withInput()->withErrors(['offer_price' => lozan_t('admin.form.errOfferTooHigh')]);
         }
 
+        // A product shown in the shop needs at least one photo.
+        $keptImages = $product->exists
+            ? $product->images()->whereIn('id', $data['keep_images'] ?? [])->count()
+            : 0;
+        if ($request->boolean('published') && $keptImages + count($request->file('images', [])) === 0) {
+            return back()->withInput()->withErrors(['images' => lozan_t('admin.form.errImages')]);
+        }
+
         $nullIfBlank = fn (?string $value) => ($value = trim((string) $value)) === '' ? null : $value;
 
         DB::transaction(function () use ($request, $product, $data, $nullIfBlank) {
@@ -113,7 +128,6 @@ class ProductController extends Controller
                 'category' => $data['category'],
                 'published' => $request->boolean('published'),
                 'stock_status' => $data['stock_status'],
-                'cover_index' => (int) ($data['cover_index'] ?? 0),
                 'slug' => $slug,
                 'seo_title_ar' => $nullIfBlank($data['seo_title_ar'] ?? null),
                 'seo_title_en' => $nullIfBlank($data['seo_title_en'] ?? null),
@@ -135,7 +149,7 @@ class ProductController extends Controller
 
             $this->syncColors($request, $product);
             $this->syncSizes($request, $product);
-            $this->syncImages($request, $product);
+            $this->syncImages($request, $product, $data['cover'] ?? null, (int) ($data['cover_index'] ?? 0));
         });
 
         return redirect()->route('admin.products');
@@ -179,10 +193,14 @@ class ProductController extends Controller
         }
     }
 
-    private function syncImages(Request $request, Product $product): void
+    /**
+     * Removes images not kept, appends uploads, and sets the cover from the
+     * chosen photo ("existing:{id}" or "new:{upload position}").
+     */
+    private function syncImages(Request $request, Product $product, ?string $cover, int $legacyCoverIndex): void
     {
         $keep = collect($request->input('keep_images', []))->map(fn ($id) => (int) $id)->all();
-        foreach ($product->images as $image) {
+        foreach ($product->images()->get() as $image) {
             if (! in_array($image->id, $keep, true)) {
                 if (! str_starts_with($image->path, 'http')) {
                     Storage::disk('public')->delete($image->path);
@@ -190,26 +208,29 @@ class ProductController extends Controller
                 $image->delete();
             }
         }
-        if ($request->hasFile('images')) {
-            $sort = $product->images()->count();
-            foreach ($request->file('images') as $file) {
-                if (! $file || ! $file->isValid()) {
-                    continue;
-                }
-                $path = $file->store('products/'.$product->id, 'public');
-                ProductImage::query()->create([
-                    'product_id' => $product->id,
-                    'path' => $path,
-                    'sort_order' => $sort++,
-                ]);
+
+        $uploaded = [];
+        $sort = (int) $product->images()->max('sort_order') + 1;
+        foreach ($request->file('images', []) as $position => $file) {
+            if (! $file || ! $file->isValid()) {
+                continue;
             }
+            $uploaded[$position] = ProductImage::query()->create([
+                'product_id' => $product->id,
+                'path' => $file->store('products/'.$product->id, 'public'),
+                'sort_order' => $sort++,
+            ])->id;
         }
-        $product->refresh();
-        $count = $product->images()->count();
-        if ($count === 0) {
-            // allow save without images only when editing existing with leftover? plan required at least one for new
-        }
-        $product->cover_index = min((int) $product->cover_index, max(0, $count - 1));
+
+        $ids = $product->images()->pluck('id')->all();
+        [$kind, $ref] = $cover ? explode(':', $cover) : [null, null];
+        $coverId = match ($kind) {
+            'existing' => (int) $ref,
+            'new' => $uploaded[(int) $ref] ?? null,
+            default => null,
+        };
+        $index = $coverId !== null ? array_search($coverId, $ids, true) : false;
+        $product->cover_index = $index !== false ? $index : min($legacyCoverIndex, max(0, count($ids) - 1));
         $product->save();
     }
 }

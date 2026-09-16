@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\SitemapService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
@@ -41,7 +43,10 @@ class ProductSeoTest extends TestCase
 
     private function formData(array $overrides = []): array
     {
+        Storage::fake('public');
+
         return $overrides + [
+            'images' => [UploadedFile::fake()->image('dress.jpg', 600, 800)],
             'name' => 'فستان ملكي',
             'name_en' => 'Royal Dress',
             'price' => '49.5',
@@ -132,7 +137,7 @@ class ProductSeoTest extends TestCase
         $admin = $this->admin();
 
         $this->actingAs($admin)->get(route('admin.products.create'))->assertOk()
-            ->assertSee('class="advanced"', false)->assertSee('name="seo_title_en"', false);
+            ->assertSee('class="pf-advanced"', false)->assertSee('name="seo_title_en"', false);
 
         $this->actingAs($admin)->post(route('admin.products.store'), $this->formData(['name_en' => 'Pearl Midi Dress', 'material' => 'Satin']));
         $product = Product::query()->sole();

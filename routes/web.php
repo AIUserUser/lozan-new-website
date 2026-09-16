@@ -15,10 +15,20 @@ use App\Http\Controllers\UtilityController;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TrackStorefront;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-Route::get('/sitemap.xml', [UtilityController::class, 'sitemap']);
-Route::get('/robots.txt', [UtilityController::class, 'robots']);
+// Crawler files: no session, cookies, or CSRF needed.
+Route::withoutMiddleware([StartSession::class, ShareErrorsFromSession::class, PreventRequestForgery::class, AddQueuedCookiesToResponse::class, EncryptCookies::class])->group(function () {
+    Route::get('/sitemap.xml', [UtilityController::class, 'sitemap']);
+    Route::get('/robots.txt', [UtilityController::class, 'robots']);
+    Route::get('/llms.txt', [UtilityController::class, 'llms']);
+    Route::get('/llms-full.txt', [UtilityController::class, 'llmsFull']);
+});
 Route::post('/telegram/webhook', [UtilityController::class, 'telegramWebhook']);
 
 Route::get('/admin/login', [LoginController::class, 'show'])->name('admin.login');

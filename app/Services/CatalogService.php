@@ -33,7 +33,7 @@ class CatalogService
                 return false;
             }
             if ($colorKey) {
-                $keys = collect($p->colorArrays())->map(fn ($c) => color_key($c))->all();
+                $keys = collect($p->colorArrays())->map(fn ($c) => color_filter_key($c))->all();
                 if (! in_array($colorKey, $keys, true)) {
                     return false;
                 }
@@ -49,46 +49,55 @@ class CatalogService
         })->values();
     }
 
-    public function colorOptions(Collection $products): array
+    /**
+     * Color and size choices with product counts. Each facet is counted against
+     * the other active filters, so a choice never leads to an empty page;
+     * the selected value is always kept.
+     *
+     * @return array{colors: array<int, array{key: string, label: string, hex: ?string, count: int}>, sizes: array<int, array{value: string, count: int}>}
+     */
+    public function facets(Collection $products, ?string $category, ?string $colorKey, ?string $size): array
     {
-        $map = [];
-        foreach ($products as $p) {
+        $size = $size ? trim(preg_replace('/^eu\s*/i', '', $size) ?? $size) : null;
+        $colors = [];
+        foreach ($this->filter($products, $category, null, $size) as $p) {
+            $seen = [];
             foreach ($p->colorArrays() as $c) {
-                $key = color_key($c);
-                if (trim(str_replace('|', '', $key)) === '') {
+                $key = color_filter_key($c);
+                if ($key === '' || isset($seen[$key])) {
                     continue;
                 }
-                if (! isset($map[$key])) {
-                    $map[$key] = ['key' => $key, 'color' => $c, 'label' => color_label($c)];
-                }
+                $seen[$key] = true;
+                $colors[$key] ??= ['key' => $key, 'label' => color_label($c), 'hex' => $c['hex'] ?: null, 'count' => 0];
+                $colors[$key]['count']++;
             }
         }
-        $opts = array_values($map);
-        usort($opts, fn ($a, $b) => strcmp($a['label'], $b['label']));
+        if ($colorKey && ! isset($colors[$colorKey])) {
+            $match = $products->flatMap(fn (Product $p) => $p->colorArrays())->first(fn ($c) => color_filter_key($c) === $colorKey);
+            if ($match) {
+                $colors[$colorKey] = ['key' => $colorKey, 'label' => color_label($match), 'hex' => $match['hex'] ?: null, 'count' => 0];
+            }
+        }
+        $colors = array_values($colors);
+        usort($colors, fn ($a, $b) => [$b['count'], $a['label']] <=> [$a['count'], $b['label']]);
 
-        return $opts;
-    }
-
-    public function sizeOptions(Collection $products): array
-    {
-        $set = [];
-        foreach ($products as $p) {
-            foreach ($p->sizeValues() as $s) {
+        $sizes = [];
+        foreach ($this->filter($products, $category, $colorKey, null) as $p) {
+            foreach (array_unique($p->sizeValues()) as $s) {
                 $n = trim(preg_replace('/^eu\s*/i', '', (string) $s) ?? (string) $s);
                 if ($n !== '') {
-                    $set[$n] = $n;
+                    $sizes[$n] = ['value' => $n, 'count' => ($sizes[$n]['count'] ?? 0) + 1];
                 }
             }
         }
-        $vals = array_values($set);
-        usort($vals, function ($a, $b) {
-            if (is_numeric($a) && is_numeric($b)) {
-                return (float) $a <=> (float) $b;
-            }
+        if ($size && ! isset($sizes[$size])) {
+            $sizes[$size] = ['value' => $size, 'count' => 0];
+        }
+        $sizes = array_values($sizes);
+        usort($sizes, fn ($a, $b) => is_numeric($a['value']) && is_numeric($b['value'])
+            ? (float) $a['value'] <=> (float) $b['value']
+            : strcmp($a['value'], $b['value']));
 
-            return strcmp($a, $b);
-        });
-
-        return $vals;
+        return ['colors' => $colors, 'sizes' => $sizes];
     }
 }

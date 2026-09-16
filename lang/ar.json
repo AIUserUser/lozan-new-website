@@ -84,7 +84,10 @@
     "filterSizesA11y": "تصفية حسب المقاس",
     "filterClear": "مسح التصفية",
     "empty": "لا توجد منتجات أخرى.",
-    "emptyFiltered": "لا توجد قطع تطابق هذه التصفية."
+    "emptyFiltered": "لا توجد قطع تطابق هذه التصفية.",
+    "resultCount": "عدد القطع: {count}",
+    "resultCountOne": "قطعة واحدة",
+    "removeFilter": "إزالة التصفية: {name}"
   },
   "home": {
     "heroA11y": "مرحبا",

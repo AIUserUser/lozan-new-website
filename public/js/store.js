@@ -34,6 +34,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Shop filter dropdowns: one open at a time; close on outside click or Escape.
+  const drops = [...document.querySelectorAll("[data-sf-drop]")];
+  drops.forEach((drop) => {
+    drop.addEventListener("toggle", () => {
+      if (drop.open) drops.forEach((other) => { if (other !== drop) other.open = false; });
+    });
+  });
+  document.addEventListener("click", (e) => {
+    drops.forEach((drop) => { if (drop.open && !drop.contains(e.target)) drop.open = false; });
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    const open = drops.find((drop) => drop.open);
+    if (open) {
+      open.open = false;
+      open.querySelector("summary").focus();
+    }
+  });
+
   const delivery = document.getElementById("delivery");
   const addressField = document.getElementById("address-field");
   if (delivery && addressField) {

@@ -17,8 +17,7 @@ class HomeController extends Controller
         return view('store.home', [
             'products' => $filtered,
             'allProducts' => $products,
-            'colorOptions' => $catalog->colorOptions($products),
-            'sizeOptions' => $catalog->sizeOptions($products),
+            'facets' => $catalog->facets($products, 'all', $color, $size),
             'selectedColor' => $color,
             'selectedSize' => $size,
             'seo' => $seo->page('home', ''),

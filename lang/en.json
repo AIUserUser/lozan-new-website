@@ -84,7 +84,10 @@
     "filterSizesA11y": "Filter by size",
     "filterClear": "Clear filter",
     "empty": "No products yet.",
-    "emptyFiltered": "No pieces match these filters."
+    "emptyFiltered": "No pieces match these filters.",
+    "resultCount": "{count} pieces",
+    "resultCountOne": "1 piece",
+    "removeFilter": "Remove filter: {name}"
   },
   "home": {
     "heroA11y": "Welcome",

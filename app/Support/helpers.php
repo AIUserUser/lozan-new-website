@@ -107,6 +107,19 @@ if (! function_exists('color_key')) {
     }
 }
 
+if (! function_exists('color_filter_key')) {
+    /** URL-friendly key that groups the same color across products (e.g. "burgundy"). */
+    function color_filter_key(?array $color): string
+    {
+        if (! $color) {
+            return '';
+        }
+        $en = \Illuminate\Support\Str::slug((string) ($color['en'] ?? ''));
+
+        return $en !== '' ? $en : trim((string) ($color['ar'] ?? ''));
+    }
+}
+
 if (! function_exists('color_label')) {
     function color_label(?array $color, ?string $locale = null): string
     {

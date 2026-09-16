@@ -7,7 +7,7 @@
             <h1>{{ lozan_t('shop.title') }}</h1>
             <p class="muted">{{ lozan_t('shop.subtitle') }}</p>
             <div class="shop-toolbar">
-                @include('partials.filters', ['formAction' => locale_url('shop'), 'showCategory' => true])
+                @include('partials.filters', ['formAction' => locale_url('shop'), 'showCategory' => true, 'resultCount' => $products->count()])
             </div>
         </header>
         @if($allProducts->isEmpty())
